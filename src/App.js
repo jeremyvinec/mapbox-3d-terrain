@@ -1,25 +1,31 @@
-import logo from './logo.svg';
+import React, { useRef, useEffect } from 'react';
+import mapboxgl from 'mapbox-gl';
+
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+
+const App = () => {
+  const mapContainerRef = useRef(null);
+
+  // initialize map when component mounts
+  useEffect(() => {
+    const map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      // See style options here: https://docs.mapbox.com/api/maps/#styles
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [-104.9876, 39.7405],
+      zoom: 12.5,
+    });
+
+    // add navigation control (the +/- zoom buttons)
+    map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+    // clean up on unmount
+    return () => map.remove();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return <div className="map-container" ref={mapContainerRef} />;
+};
 
 export default App;
